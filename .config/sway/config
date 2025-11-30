@@ -1,0 +1,218 @@
+### Startup programs
+## Windows
+exec firefox
+exec steam
+exec vesktop
+## Daemons
+exec dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP=sway
+exec openrgb -p StaticRed
+exec clipse -listen
+
+### Output configuration
+# Wallpapers
+output DP-2 bg /home/fadasa/wallpaper/Remilia/DressSpin.png fill
+#output "DVI-D-1" bg /home/fadasa/wallpaper/Remilia/Goat.png fill
+
+# Display ordering
+output DP-3 pos 0 0 res 1920x1080
+#output DVI-D1 pos 1920 1080 res 1440x900@60Hz
+
+# Adaptative sync
+output DP-3 adaptive_sync on
+
+### Input configuration
+# BR keyboard
+input * {
+    xkb_layout "br"
+}
+input <identifier> xkb_model "pc101"
+
+# Mouse
+input type:pointer {
+    accel_profile flat
+}
+
+### Theme
+default_border pixel
+
+# Colors:
+set $bgcolor #811c26
+set $in-bgcolor #370002
+set $text #ffffff
+set $u-bgcolor #000000
+set $indicator #811c26
+set $in-text #ffffff
+#                       border          background      text            indicator
+client.focused          $bgcolor        $bgcolor        $text           $indicator
+client.unfocused        $in-bgcolor     $in-bgcolor     $in-text        $in-bgcolor
+client.focused_inactive $in-bgcolor     $in-bgcolor     $in-text        $in-bgcolor
+client.urgent           $u-bgcolor      $u-bgcolor      $text           $u-bgcolor
+
+
+# Status Bar:
+bar {
+	swaybar_command waybar
+	modifier Mod4
+	position top
+	font terminus 8
+	mode hide
+	colors {
+		focused_workspace $in-bgcolor $bgcolor $text
+	}
+}
+
+include /etc/sway/config.d/*
+
+### Window rules
+## Workspace rules
+assign {
+	[class="vesktop"] 2
+	[class="steam"] 9
+}
+
+## Window modifiers
+#set the variables
+set {
+	$game inhibit_idle focus; floating enable; border none; fullscreen enable; shadows disable
+	$popup floating enable; border pixel 1; sticky enable; shadows enable; resize set 640 480
+	$float floating enable; border pixel 1; shadows enable
+	$video inhibit_idle fullscreen; border none; max_render_time off
+	$important inhibit_idle open; floating enable; border pixel 1
+	$max inhibit_idle visible; floating enable; sticky enable; border pixel 1
+}
+
+for_window {
+# $game inhibit_idle focus; floating enable; border none; fullscreen enable; shadows disable
+	[app_id="gamescope"] $game
+	[class="steam_app.*"] $game
+	[instance="steam_app.*"] $game
+
+# $popup floating enable; border pixel 1; sticky enable; shadows enable
+	[app_id="firefox" title="Picture-in-Picture$"] $popup
+	[app_id="clipse"] $popup
+	[app_id="hyprland-share-picker"] $popup
+
+# $video inhibit_idle fullscreen; border none; max_render_time off
+	[app_id="mpv"] $video
+
+#misc
+	[class="steam"] floating enable; max_render_time off; blur disabled
+	[instance="steamwebhelper"] floating enable; max_render_time off; blur disabled
+	[urgent=latest] focus
+	[floating] shadows enable
+	[app_id="firefox" title="Firefox — Sharing Indicator"] floating enable; kill
+	[title="Wine System Tray"] floating enable; kill
+}
+
+### Variables
+# Logo key. Use Mod1 for Alt.
+set $mod Mod4
+
+# Movement keys
+set {
+	$left h
+	$down j
+	$up k
+	$right l
+}
+
+# Terminal Emulator
+set $term kitty
+
+# Your preferred application launcher
+set $menu rofi -show drun -disable-history
+
+### Key bindings
+## Basics
+bindsym $mod+Return exec $term
+bindsym $mod+q kill
+bindsym $mod+d exec $menu
+bindsym $mod+Shift+r reload
+bindsym $mod+f fullscreen
+bindsym $mod+Shift+space floating toggle
+bindsym $mod+Shift+s sticky toggle
+# Swap focus between the tiling area and the floating area
+bindsym $mod+space focus mode_toggle
+
+# Drag floating windows by holding down $mod and left mouse button.
+# Resize them with right mouse button + $mod.
+# Despite the name, also works for non-floating windows.
+# Change normal to inverse to use left mouse button for resizing and right
+# mouse button for dragging.
+floating_modifier $mod normal
+
+# Exit sway (logs you out of your Wayland session)
+bindsym $mod+Shift+e exec swaynag -t warning -m 'You pressed the exit shortcut. Do you really want to exit sway? This will end your Wayland session.' -B 'Yes, exit sway' 'swaymsg exit'
+
+## Moving around:
+# Move your focus around
+bindsym $mod+$left focus left
+bindsym $mod+$down focus down
+bindsym $mod+$up focus up
+bindsym $mod+$right focus right
+# Move the focused window with the same, but add Shift
+bindsym $mod+Shift+$left move left
+bindsym $mod+Shift+$down move down
+bindsym $mod+Shift+$up move up
+bindsym $mod+Shift+$right move right
+
+## Workspaces:
+# Switch to workspace
+bindsym $mod+1 workspace number 1
+bindsym $mod+2 workspace number 2
+bindsym $mod+3 workspace number 3
+bindsym $mod+4 workspace number 4
+bindsym $mod+5 workspace number 5
+bindsym $mod+6 workspace number 6
+bindsym $mod+7 workspace number 7
+bindsym $mod+8 workspace number 8
+bindsym $mod+9 workspace number 9
+bindsym $mod+0 workspace number 10
+# Move focused container to workspace
+bindsym $mod+Shift+1 move container to workspace number 1
+bindsym $mod+Shift+2 move container to workspace number 2
+bindsym $mod+Shift+3 move container to workspace number 3
+bindsym $mod+Shift+4 move container to workspace number 4
+bindsym $mod+Shift+5 move container to workspace number 5
+bindsym $mod+Shift+6 move container to workspace number 6
+bindsym $mod+Shift+7 move container to workspace number 7
+bindsym $mod+Shift+8 move container to workspace number 8
+bindsym $mod+Shift+9 move container to workspace number 9
+bindsym $mod+Shift+0 move container to workspace number 10
+
+## Layout
+# Layout Style
+bindsym $mod+s layout stacking
+bindsym $mod+w layout tabbed
+bindsym $mod+e layout toggle split
+# Split mode
+bindsym $mod+b splitv
+bindsym $mod+Shift+b splith
+# Move focus to the parent container
+bindsym $mod+a focus parent
+
+## Scratchpad:
+# Move the currently focused window to the scratchpad
+bindsym $mod+Shift+minus move scratchpad
+# Show the next scratchpad window or hide the focused scratchpad window.
+bindsym $mod+minus scratchpad show
+
+## Resizing containers:
+mode "resize" {
+    bindsym $left resize shrink width 10px
+    bindsym $down resize grow height 10px
+    bindsym $up resize shrink height 10px
+    bindsym $right resize grow width 10px
+
+    # Return to default mode
+    bindsym Return mode "default"
+    bindsym Escape mode "default"
+}
+bindsym $mod+r mode "resize"
+
+## Copypaste
+bindsym $mod+v exec kitty --class clipse -e clipse
+
+## Screenshot
+bindsym $mod+p exec slurp | grim -g - - | wl-copy
+bindsym $mod+Shift+p exec grim - | wl-copy
